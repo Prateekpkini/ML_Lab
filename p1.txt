@@ -1,0 +1,85 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+data = pd.read_csv("ibm_hr_employee-attrition.csv")
+print("Dataset loaded successfully.")
+data.info()
+
+num_columns = data.select_dtypes(include=['number']).columns
+cat_columns = data.select_dtypes(exclude=['number']).columns
+print(f"\nNumerical columns ({len(num_columns)}): {list(num_columns)}")
+print(f"Categorical columns ({len(cat_columns)}): {list(cat_columns)}")
+
+num_column = input("\nEnter the name of a numerical column: ")
+if num_column in data.columns:
+    column_data = data[num_column]
+    mean = column_data.mean()
+    median = column_data.median()
+    mode = column_data.mode().iloc[0] if not column_data.mode().empty else None
+    std_dev = column_data.std()
+    variance = column_data.var()
+    value_range = column_data.max() - column_data.min()
+    
+    print(f"Statistics for {num_column}:\n")
+    print(f"Mean: {mean}")
+    print(f"Median: {median}")
+    print(f"Mode: {mode}")
+    print(f"Standard Deviation: {std_dev}")
+    print(f"Variance: {variance}")
+    print(f"Range: {value_range}\n")
+
+    
+    plt.figure(figsize=(8, 3))
+    
+    
+    plt.subplot(1, 2, 1)
+    sns.histplot(column_data, kde=True, bins=10, color='blue')
+    plt.title(f"Histogram of {num_column}")
+
+    
+    plt.subplot(1, 2, 2)
+    sns.boxplot(x=column_data, color='lightgreen')
+    plt.title(f"Boxplot of {num_column}")
+
+    plt.tight_layout()
+    plt.show()
+    
+    q1 = column_data.quantile(0.25)
+    q3 = column_data.quantile(0.75)
+    iqr = q3 - q1
+    lower_bound = q1 - (1.5 * iqr)
+    upper_bound = q3 + (1.5 * iqr)
+
+    outliers = column_data[(column_data < lower_bound) | (column_data > upper_bound)]
+    
+    print(f"Outliers in {num_column}: {len(outliers)}")
+    print(outliers)
+
+else:
+    print(f"Column '{num_column}' not found in the dataset.")
+
+
+cat_column = input("\nEnter the name of a categorical column: ")
+if cat_column in data.columns:
+    category_counts = data[cat_column].value_counts()
+    chart_type = input("Choose chart type (bar/pie): ")
+    if chart_type == 'bar':
+        category_counts.plot(kind='bar', color='orange', figsize=(5, 3))
+        plt.title(f"Bar Chart of {cat_column}")
+        plt.xlabel(cat_column)
+        plt.ylabel("Frequency")
+        plt.xticks(fontsize=8)
+        plt.xticks(rotation=45,ha='right')
+        plt.show()
+    elif chart_type == 'pie':
+        category_counts.plot(kind='pie', autopct="%.1f%%", figsize=(4, 4), colormap='tab10')
+        plt.title(f"Pie Chart of {cat_column}")
+        plt.ylabel("")
+        plt.show()
+    else:
+        print("Invalid chart type. Please use 'bar' or 'pie'.")
+    print(f"Frequency of categories in {cat_column}:\n{category_counts}\n")
+else:
+        print(f"Column '{cat_column}' not found in the dataset.")
