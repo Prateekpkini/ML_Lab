@@ -7,6 +7,8 @@ print("Pearson Correlation Coefficient:\n", correlation)
 covariance = data[['sepal_length','petal_length']].cov()
 print("Covariance Matrix:\n", covariance)
 plt.figure(figsize=(8, 5))
+x_col = 'sepal_length'
+y_col = 'petal_length'
 plt.scatter(data[x_col], data[y_col])
 plt.xlabel(x_col)
 plt.ylabel(y_col)
